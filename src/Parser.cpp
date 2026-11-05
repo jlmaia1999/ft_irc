@@ -48,3 +48,15 @@ Command Parser::parseLine(const std::string &line) {
 	}
 	return cmd;
 }
+
+std::vector<Command> Parser::parseBuffer(const std::string &buffer) {
+	std::vector<Command> cmds;
+	std::string remaining = buffer;
+	std::string::size_type pos;
+	while ((pos = remaining.find("\r\n")) != std::string::npos) {
+		std::string line = remaining.substr(0, pos);
+		cmds.push_back(parseLine(line));
+		remaining = remaining.substr(pos + 2);
+	}
+	return cmds;
+}

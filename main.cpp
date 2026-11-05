@@ -4,18 +4,16 @@
 
 int main()
 {
-	std::string msg1 = "NICK alice\r\n";
-	std::string msg2 = "USER alice 0 * :Alice Smith\r\n";
-
-	Command c1 = Parser::parseLine(msg1);
-	Command c2 = Parser::parseLine(msg2);
-
-	std::cout << "c1 name: " << c1.name << std::endl;
-	std::cout << "c1 param: " << c1.params[0] << std::endl;
-	std::cout << std::endl;
-	std::cout << "c2 name: " << c2.name << std::endl;
-	std::cout << "c2 param: " << c2.params[0] << std::endl;
-	std::cout << "c2 trailing: " << c2.trailing << std::endl;
-
+	std::string raw = "NICK alice\r\nUSER alice 0 * :Alice Smith\r\nJOIN #general\r\n";
+	std::vector<Command> commands = Parser::parseBuffer(raw);
+	for (std::size_t i = 0; i < commands.size(); ++i) {
+		std::cout << "command " << i << ":" << std::endl;
+		std::cout << "name: " << commands[i].name << std::endl;
+		for (std::size_t j = 0; j < commands[i].params.size(); ++j)
+			std::cout << "param[" << j << "]: " << commands[i].params[j] << std::endl;
+		if (!commands[i].trailing.empty())
+			std::cout << "trailing: " << commands[i].trailing << std::endl;
+		std::cout << std::endl;
+	}
 	return 0;
 }
