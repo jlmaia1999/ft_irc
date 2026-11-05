@@ -1,6 +1,6 @@
 #include "server.hpp"
 
-Client::Client(): _fd(0), _ipadd(NULL){}
+Client::Client(): _fd(0), _ipadd(){}
 
 Client::~Client(){}
 

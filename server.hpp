@@ -38,7 +38,7 @@ class Server
 		Server();
 		~Server();
 
-		void ServerInit();
+		void ServerInit(int port);
 		void ServerSocket();
 		void AcceptNewClient();
 		void ReceiveNewData(int fd);

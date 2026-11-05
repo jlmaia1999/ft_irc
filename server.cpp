@@ -5,9 +5,9 @@ Server::Server(){}
 
 Server::~Server(){}
 
-void Server::ServerInit()
+void Server::ServerInit(int port)
 {
-	_Port = 4444;
+	_Port = port;
 	ServerSocket();
 
 	while (Server::Signal == false)
