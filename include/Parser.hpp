@@ -13,7 +13,7 @@ class Parser
 		Parser();
 		~Parser();
 		static Command parseLine(const std::string &line);
-		static std::vector<Command> parseBuffer(const std::string &buffer);
+		static std::vector<Command> parseBuffer(const std::string &buffer, std::string &remainder);
 };
 
 #endif

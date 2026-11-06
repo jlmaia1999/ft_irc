@@ -49,14 +49,15 @@ Command Parser::parseLine(const std::string &line) {
 	return cmd;
 }
 
-std::vector<Command> Parser::parseBuffer(const std::string &buffer) {
+std::vector<Command> Parser::parseBuffer(const std::string &buffer, std::string &remainder) {
 	std::vector<Command> cmds;
-	std::string remaining = buffer;
+	remainder += buffer;
 	std::string::size_type pos;
-	while ((pos = remaining.find("\r\n")) != std::string::npos) {
-		std::string line = remaining.substr(0, pos);
-		cmds.push_back(parseLine(line));
-		remaining = remaining.substr(pos + 2);
+	while ((pos = remainder.find("\r\n")) != std::string::npos) {
+		std::string line = remainder.substr(0, pos);
+		remainder.erase(0, pos + 2);
+		if (!line.empty())
+			cmds.push_back(parseLine(line));
 	}
 	return cmds;
 }
