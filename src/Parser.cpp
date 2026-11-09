@@ -5,29 +5,32 @@ Parser::Parser() {}
 Parser::~Parser() {}
 
 Command Parser::parseLine(const std::string &line) {
-	Command cmd;
+	std::string prefix;
+	std::string name;
+	std::vector<std::string> params;
+	std::string trailing;
 	std::string input = line;
 	while (!input.empty() && (input[input.size() - 1] == '\n' || input[input.size() - 1] == '\r'))
 		input.erase(input.size() - 1, 1);
 	if (input.empty())
-		return cmd;
+		Command(prefix, name, params, trailing);
 	if (!input.empty() && input[0] == ':') {
 		std::string::size_type pos = input.find(' ');
 		if (pos == std::string::npos)
-			return cmd;
-		cmd.prefix = input.substr(1, pos - 1);
+			Command(prefix, name, params, trailing);
+		prefix = input.substr(1, pos - 1);
 		input = input.substr(pos + 1);
 	}
 	while (!input.empty() && input[0] == ' ')
 		input.erase(0, 1);
 	if (input.empty())
-		return cmd;
+		Command(prefix, name, params, trailing);
 	std::string::size_type pos = input.find(' ');
 	if (pos == std::string::npos) {
-		cmd.name = input;
-		return cmd;
+		name = input;
+		Command(prefix, name, params, trailing);
 	}
-	cmd.name = input.substr(0, pos);
+	name = input.substr(0, pos);
 	input = input.substr(pos + 1);
 	while (!input.empty()) {
 		while (!input.empty() && input[0] == ' ')
@@ -35,18 +38,18 @@ Command Parser::parseLine(const std::string &line) {
 		if (input.empty())
 			break;
 		if (input[0] == ':') {
-			cmd.trailing = input.substr(1);
+			trailing = input.substr(1);
 			break ;
 		}
 		pos = input.find(' ');
 		if (pos == std::string::npos) {
-			cmd.params.push_back(input);
+			params.push_back(input);
 			break;
 		}
-		cmd.params.push_back(input.substr(0, pos));
+		params.push_back(input.substr(0, pos));
 		input = input.substr(pos + 1);
 	}
-	return cmd;
+	return Command(prefix, name, params, trailing);
 }
 
 std::vector<Command> Parser::parseBuffer(const std::string &buffer, std::string &remainder) {

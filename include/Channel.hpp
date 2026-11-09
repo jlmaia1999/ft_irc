@@ -4,20 +4,23 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include "../server.hpp"
 
 class Channel
 {
 	private:
 		std::string _name;
 		std::string _topic;
-		std::set<int> _members; //replace <int> with Client object
-		std::set<int> _operators; //replace <int> with Client object
+		std::set<Client> _members;
+		std::set<Client> _operators;
 	public:
+		Channel();
+		~Channel();
 		Channel(const std::string &name);
 		const std::string &getName() const;
-		void addMember(int client_id); //replace int with Client object
-		void removeMember(int client_id); //replace int with Client object
-		bool hasMember(int client_id) const; //replace int with Client object
+		void addMember(Client client_id);
+		void removeMember(Client client_id);
+		bool hasMember(Client client_id) const;
 		bool empty() const;
 };
 
