@@ -11,9 +11,15 @@ int main(int argc, char **argv)
     std::cout << "SERVER"<< std::endl;
     try
     {
+        std::istringstream port(argv[1]);
+        int port_num;
+        if (!(port >> port_num) || port_num <= 0 || port_num > 65535)
+        {
+            throw std::invalid_argument("Invalid port number");
+        }
         signal(SIGINT, Server::SignalHandler);
         signal(SIGQUIT, Server::SignalHandler);
-        ser.ServerInit(std::atoi(argv[1]));
+        ser.ServerInit(port_num);
     }
     catch(const std::exception& e)
     {
@@ -21,5 +27,4 @@ int main(int argc, char **argv)
         std::cerr << e.what() << std::endl;
     }
     std::cout << "The server Closed" << std::endl;
-
 }
