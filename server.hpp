@@ -29,7 +29,7 @@ class Client
 class Server
 {
 	private:
-		std::vector<Client> _clients; //type is Client, switch once the class is created
+		std::vector<Client> _clients;
 		int	_Port;
 		int	_SocketFd;
 		static bool Signal;
