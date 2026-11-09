@@ -1,23 +1,20 @@
-NAME = ircserv
+NAME = ft_irc
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp src/Parser.cpp src/Command.cpp src/Channel.cpp
-OBJS = $(SRCS:.cpp=.o)
+SRCS = main.cpp client.cpp server.cpp src/Channel.cpp src/Command.cpp src/Execution.cpp \
+	   src/Parser.cpp
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-clean:
-	rm -rf $(OBJS)
+$(NAME):
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(SRCS)
+	@echo created
+clean:	
 
 fclean: clean
-	rm -rf $(NAME)
+	rm -f $(NAME)
+	@echo cleaned
 
 re: fclean all
 
