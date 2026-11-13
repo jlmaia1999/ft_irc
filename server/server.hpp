@@ -29,17 +29,23 @@ class Client
 class Server
 {
 	private:
+		bool _running;
+
 		std::vector<Client> _clients;
-		int	_Port;
-		int	_SocketFd;
-		static bool Signal;
+		std::vector<int> _channels; // Placeholder for channel management
 		std::vector<struct pollfd> fds;
 
+		std::string _hostname;
+		int	_Port;
+		std::string _Password;
+		int	_SocketFd;
+		static bool Signal;
+
 	public:
-		Server();
+		Server(int port, std::string password);
 		~Server();
 
-		void ServerInit(int port);
+		void ServerInit();
 		void ServerSocket();
 		void AcceptNewClient();
 		void ReceiveNewData(int fd);

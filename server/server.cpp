@@ -1,15 +1,23 @@
 #include "server.hpp"
 bool Server::Signal = false;
 
-Server::Server(){}
+Server::Server(int port, std::string password):
+	_running(false),
+	_hostname("127.0.0.1"),
+	_Port(port),
+	_Password(password),
+	_SocketFd(-1){}
 
-Server::~Server(){}
-
-void Server::ServerInit(int port)
+Server::~Server()
 {
-	_Port = port;
-	ServerSocket();
+	if (_SocketFd != -1)
+		close(_SocketFd);
+}
 
+void Server::ServerInit()
+{
+	_running = true;
+	ServerSocket();
 	while (Server::Signal == false)
 	{
 		if ((poll(&fds[0], fds.size(), -1) == -1) && Server::Signal == false)
@@ -120,7 +128,7 @@ void Server::SignalHandler(int signum)
 
 void Server::ClearClients(int fd)
 {
-	for(size_t i = 0; i < fds.size(); i++)
+	for(size_t i = 0; i < fds.size(); i++)	
 	{
 		if (fds[i].fd == fd)
 		{

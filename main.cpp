@@ -7,19 +7,22 @@ int main(int argc, char **argv)
         std::cerr << "Usage: ./server <port> <password>" << std::endl;
         return (1);
     }
-    Server ser;
+    std::istringstream port(argv[1]);
+    int port_num = 0;
+    port >> port_num;
+    std::cout << "Port: " << port_num << std::endl;
+    Server ser(port_num, argv[2]);
     std::cout << "SERVER"<< std::endl;
     try
     {
-        std::istringstream port(argv[1]);
-        int port_num;
-        if (!(port >> port_num) || port_num <= 0 || port_num > 65535)
+        
+        if (port_num <= 0 || port_num > 65535)
         {
             throw std::invalid_argument("Invalid port number");
         }
         signal(SIGINT, Server::SignalHandler);
         signal(SIGQUIT, Server::SignalHandler);
-        ser.ServerInit(port_num);
+        ser.ServerInit();
     }
     catch(const std::exception& e)
     {
