@@ -12,33 +12,25 @@
 #include <poll.h> 
 #include <csignal> 
 #include <sstream>
+#include <map>
 
-class Client
-{
-	private:
-		int _fd;
-		std::string _ipadd;
-	public:
-		Client();
-		~Client();
-		int GetFd();
-		void SetFd(int fd);
-		void SetIpadd(std::string ipadd);
-};
+class Client;
+
+class Channel;
 
 class Server
 {
 	private:
 		bool _running;
-
-		std::vector<Client> _clients;
-		std::vector<int> _channels; // Placeholder for channel management
-		std::vector<struct pollfd> fds;
-
-		std::string _hostname;
+		int	_SocketFd;
 		int	_Port;
 		std::string _Password;
-		int	_SocketFd;
+		std::string _hostname;
+		std::vector<struct pollfd> fds;
+		std::vector<Client> _clients;
+		std::vector<int> _channels; // Placeholder for channel management
+		std::map<std::string, int> _commands; //command not created yet, int is supposed to be (command *)
+
 		static bool Signal;
 
 	public:
@@ -47,10 +39,19 @@ class Server
 
 		void ServerInit();
 		void ServerSocket();
+		void run();
 		void AcceptNewClient();
 		void ReceiveNewData(int fd);
+		void RemoveData(int i);
+		void RemoveChannel(Channel &channel);
+		void RemoveClientChannels(Client &client);
+		void shutdown();
 
 		static void SignalHandler(int signum);
 		void CloseFds();
 		void ClearClients(int fd);
+
+		Client *get_client(int client_fd);
+		Client *get_client(std::string nickname);
+		Channel *get_channel(std::string name);
 };
