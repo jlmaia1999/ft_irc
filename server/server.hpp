@@ -13,6 +13,7 @@
 #include <csignal> 
 #include <sstream>
 #include <map>
+#include "command.hpp"
 
 class Client;
 
@@ -29,7 +30,7 @@ class Server
 		std::vector<struct pollfd> fds;
 		std::vector<Client> _clients;
 		std::vector<int> _channels; // Placeholder for channel management
-		std::map<std::string, int> _commands; //command not created yet, int is supposed to be (command *)
+		std::map<std::string, Command *> _commands;
 
 		static bool Signal;
 

@@ -21,8 +21,18 @@
 class Client
 {
 	private:
-		int _fd;
-		std::string _ipadd;
+        std::string _username;
+        std::string _nickname;
+        std::string _hostname;
+        std::string _fullname;
+        std::string _realname;
+		int _socket;
+        bool _userset;
+        bool _nickset;
+
+        std::string _input;
+        std::string _output;
+		
 	public:
 		Client();
 		~Client();
