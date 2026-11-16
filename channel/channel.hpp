@@ -19,13 +19,11 @@
 
 class Channel
 {
-    std::string _name;
-    std::string _hostname;
-    std::string _topic;
-    std::string _key;
-    std::vector<Client *> _client;
-    std::vector<Client *> _op_clients;
-    std::vector<Client *> _invited_clients;
-
-    
+	std::string _name;
+	std::string _hostname;
+	std::string _topic;
+	std::string _key;
+	std::vector<Client *> _client;
+	std::vector<Client *> _op_clients;
+	std::vector<Client *> _invited_clients;
 };

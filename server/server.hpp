@@ -29,7 +29,7 @@ class Server
 		std::string _hostname;
 		std::vector<struct pollfd> fds;
 		std::vector<Client> _clients;
-		std::vector<int> _channels; // Placeholder for channel management
+		std::vector<Channel> _channels; 
 		std::map<std::string, Command *> _commands;
 
 		static bool Signal;
@@ -44,6 +44,7 @@ class Server
 		void AcceptNewClient();
 		void ReceiveNewData(int fd);
 		void RemoveData(int i);
+		void SendData(int i);
 		void RemoveChannel(Channel &channel);
 		void RemoveClientChannels(Client &client);
 		void shutdown();

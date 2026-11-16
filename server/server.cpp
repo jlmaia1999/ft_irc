@@ -6,7 +6,9 @@ Server::Server(int port, std::string password):
 	_hostname("127.0.0.1"),
 	_Port(port),
 	_Password(password),
-	_SocketFd(-1){}
+	_SocketFd(-1),
+	_clients(),
+	_channels(){}
 
 Server::~Server()
 {
@@ -18,22 +20,7 @@ void Server::ServerInit()
 {
 	_running = true;
 	ServerSocket();
-	while (Server::Signal == false)
-	{
-		if ((poll(&fds[0], fds.size(), -1) == -1) && Server::Signal == false)
-			throw(std::runtime_error("poll() failed"));
-		for (size_t i = 0; i < fds.size(); i++)
-		{
-			if (fds[i].revents & POLLIN)
-			{
-				if (fds[i].fd == _SocketFd)
-					AcceptNewClient();
-				else
-					ReceiveNewData(fds[i].fd);
-			}
-		}
-	}
-	CloseFds();
+	
 }
 
 void Server::ServerSocket()
@@ -61,6 +48,43 @@ void Server::ServerSocket()
 	NewPoll.events = POLLIN;
 	NewPoll.revents = 0;
 	fds.push_back(NewPoll);
+	std::cout << "Server listening on port " << _Port << std::endl;
+}
+
+void Server::run()
+{
+	while (Server::Signal == false)
+	{
+		int res = (poll(&fds[0], fds.size(), -1) == -1);
+		if (res = -1)
+			throw(std::runtime_error("poll() failed"));
+		for (size_t i = 0; i < fds.size(); i++)
+		{
+			int clientsfd = fds[i].fd;
+			int revents = fds[i].revents;
+			if (revents & (POLL_ERR | POLL_HUP | POLLNVAL))
+			{
+				RemoveData(i);
+				i--;
+				continue;
+			}
+			if (revents & POLLIN)
+			{
+				ReceiveNewData(i);
+				if (i >= fds.size() || fds[i].fd != clientsfd)
+				{
+					i--;
+					continue;
+				}
+			}
+			if (revents & POLLOUT)
+				SendData(i);
+			i--;
+		}
+		if (fds[0].revents & POLLIN)
+			AcceptNewClient();
+	}
+	CloseFds();
 }
 
 void Server::CloseFds()
