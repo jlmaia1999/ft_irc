@@ -12,13 +12,14 @@
 #include <poll.h> 
 #include <csignal> 
 #include <sstream>
-#include "server.hpp"
-#include "client.hpp"
+
+class Server;
+class Client;
 
 class Command
 {
-    public:
-        Command();
-        virtual ~Command();
-        virtual void execute(Server &server, Client &client, const std::vector<std::string>& params) = 0;
+	public:
+		Command();
+		virtual ~Command();
+		virtual void execute(Server &server, Client &client, const std::vector<std::string>& params) = 0;
 };
