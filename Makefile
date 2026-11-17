@@ -2,8 +2,8 @@ NAME = ft_irc
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp client.cpp server.cpp src/Channel.cpp src/Command.cpp src/Execution.cpp \
-	   src/Parser.cpp
+SRCS = main.cpp  parsing/parsing.cpp \
+#client/client.cpp server/server.cpp
 
 all: $(NAME)
 

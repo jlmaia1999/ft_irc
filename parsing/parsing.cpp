@@ -25,7 +25,7 @@ bool parsing::parseLine(const std::string &line, IRCMessage &message) {
 			pos++;
 		message.prefix = input.substr(prefixStart, pos - prefixStart);
 	}
-	while (pos < input.size() && input[pos] == ' ' || input[pos] == '\t')
+	while (pos < input.size() && (input[pos] == ' ' || input[pos] == '\t'))
 		pos++;
 	if (pos == input.size())
 		return false;
