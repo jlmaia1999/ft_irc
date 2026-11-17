@@ -19,11 +19,19 @@
 
 class Channel
 {
-	std::string _name;
-	std::string _hostname;
-	std::string _topic;
-	std::string _key;
-	std::vector<Client *> _client;
-	std::vector<Client *> _op_clients;
-	std::vector<Client *> _invited_clients;
+	private:
+		std::string _name;
+		std::string _hostname;
+		std::string _topic;
+		std::string _key;
+		std::map<Client*, bool> _client;
+		std::vector<Client *> _invited_clients;
+	public:
+		Channel(Server *server, Client &client, std::string name);
+		void addClient(Client &client);
+		void remClient(Client &op_client, Client &client, std::string why);
+		void getClient(std::string name);
+		void sendData(Client &client, std::string cmd, std::string msg);
+		void getTopic();
+		void setTopic(Client &client, std::string topic);
 };

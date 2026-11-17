@@ -29,7 +29,7 @@ class Server
 		std::string _hostname;
 		std::vector<struct pollfd> fds;
 		std::vector<Client> _clients;
-		std::vector<Channel> _channels; 
+		std::map<std::string, Channel &> _channels;
 		std::map<std::string, Command *> _commands;
 
 		static bool Signal;
@@ -48,6 +48,8 @@ class Server
 		void RemoveChannel(Channel &channel);
 		void RemoveClientChannels(Client &client);
 		void shutdown();
+		void cmd_pass(Client &client, const std::vector<std::string>& params);
+		std::string GetHostname();
 
 		static void SignalHandler(int signum);
 		void CloseFds();

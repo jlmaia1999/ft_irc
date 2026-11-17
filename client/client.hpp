@@ -27,16 +27,35 @@ class Client
         std::string _fullname;
         std::string _realname;
 		int _socket;
-        bool _userset;
-        bool _nickset;
+		bool _Password;
+		bool _userset;
+		bool _nickset;
+        bool _isRegistered;
+        bool _isQuit;
+		bool _isWelcome;
 
         std::string _input;
         std::string _output;
 		
 	public:
-		Client();
+		Client(int socket);
 		~Client();
-		int GetFd();
-		void SetFd(int fd);
-		void SetIpadd(std::string ipadd);
+		int GetSocket() const;
+		void setPassword();
+		void setIsRegistered();
+		void setIsQuit();
+		void setIsWelcome();
+
+		std::string getUsername() const;
+		std::string getNickname() const;
+		std::string getHostname() const;
+		std::string getFullname() const;
+		std::string getRealname() const;
+		bool getIsRegistered() const;
+		bool getIsQuit() const;
+		bool getIsWelcome() const;
+
+
+		void cmd_nick(std::string nickname);
+		void cmd_user(std::string username, std::string hostname, std::string realname);
 };

@@ -169,3 +169,8 @@ void Server::ClearClients(int fd)
 		}
 	}
 }
+
+std::string Server::GetHostname()
+{
+	return _hostname;
+}
