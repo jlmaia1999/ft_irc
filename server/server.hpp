@@ -13,7 +13,7 @@
 #include <csignal> 
 #include <sstream>
 #include <map>
-#include "command.hpp"
+#include "../commands/command.hpp"
 
 class Client;
 
@@ -27,8 +27,9 @@ class Server
 		int	_Port;
 		std::string _Password;
 		std::string _hostname;
-		std::vector<struct pollfd> fds;
-		std::vector<Client> _clients;
+		std::vector<struct pollfd> _fds;
+		std::vector<Client*> _clients;
+		std::vector<int> _Quiting;
 		std::map<std::string, Channel &> _channels;
 		std::map<std::string, Command *> _commands;
 
@@ -40,15 +41,14 @@ class Server
 
 		void ServerInit();
 		void ServerSocket();
-		void run();
 		void AcceptNewClient();
 		void ReceiveNewData(int fd);
 		void RemoveData(int i);
 		void SendData(int i);
-		void RemoveChannel(Channel &channel);
-		void RemoveClientChannels(Client &client);
-		void shutdown();
-		void cmd_pass(Client &client, const std::vector<std::string>& params);
+		// void RemoveChannel(Channel &channel);
+		// void RemoveClientChannels(Client &client);
+		// void shutdown();
+		// void cmd_pass(Client &client, const std::vector<std::string>& params);
 		std::string GetHostname();
 
 		static void SignalHandler(int signum);

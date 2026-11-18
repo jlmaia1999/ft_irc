@@ -1,4 +1,5 @@
-#include "server.hpp"
+#include "server/server.hpp"
+#include "client/client.hpp"
 
 int main(int argc, char **argv)
 {
@@ -26,7 +27,7 @@ int main(int argc, char **argv)
 	}
 	catch(const std::exception& e)
 	{
-		ser.CloseFds();
+		// ser.CloseFds();
 		std::cerr << e.what() << std::endl;
 	}
 	std::cout << "The server Closed" << std::endl;

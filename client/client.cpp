@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "client.hpp"
 
 Client::Client(int socket):
 	_username(""),
@@ -10,6 +10,12 @@ Client::Client(int socket):
 	_userset(false),
 	_nickset(false)
 {}
+
+Client &Client::operator=(const Client &other)
+{
+	_socket = other._socket;
+	return *this;
+}
 
 Client::~Client()
 {
@@ -96,4 +102,45 @@ bool Client::getIsQuit() const
 bool Client::getIsWelcome() const
 {
 	return _isWelcome;
+}
+
+void Client::addInput(const std::string &data)
+{
+	_input += data;
+}
+
+bool Client::fullLine() const
+{
+	return _input.find("\r\n") != std::string::npos;
+}
+
+void Client::addOutput(const std::string &data)
+{
+	_output += _output;
+}
+
+bool Client::pendOutput() const
+{
+	return (!_output.empty());
+}
+
+const std::string& Client::getOutput() const
+{
+	return _output;
+}
+
+void Client::RemoveOutput(std::string::size_type size)
+{
+	_output.erase(0, size);
+}
+
+std::string Client::ft_getline()
+{
+	std::string::size_type i = _input.find("\r\n");
+
+	if (i == std::string::npos)
+		return "";
+	std::string line = _input.substr(0, i);
+	_input.erase(0, i + 2);
+	return line;
 }

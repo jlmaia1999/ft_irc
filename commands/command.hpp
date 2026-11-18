@@ -12,8 +12,12 @@
 #include <poll.h> 
 #include <csignal> 
 #include <sstream>
-#include "server.hpp"
-#include "client.hpp"
+#include "../server/server.hpp"
+#include "../client/client.hpp"
+
+class Client;
+class Server;
+class Channel;
 
 class Command
 {

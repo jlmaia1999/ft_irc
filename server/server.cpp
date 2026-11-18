@@ -20,7 +20,46 @@ void Server::ServerInit()
 {
 	_running = true;
 	ServerSocket();
-	
+	while (_running)
+	{
+		int res = poll(&_fds[0], _fds.size(), -1);
+
+		if(res == -1)
+		{
+			if (errno == EINTR)
+				continue;
+			throw std::runtime_error("Error:poll failed");
+		}
+		size_t i = _fds.size() - 1;
+		while(i >= 1)
+		{
+			int cli_fd = _fds[i].fd;
+			short revents = _fds[i].revents;
+			if (revents & (POLLERR | POLLHUP | POLLNVAL))
+			{
+				RemoveData(i);
+				i--;
+				continue;
+			}
+			if (revents & POLLIN)
+			{
+				ReceiveNewData(i);
+				if(i >= _fds.size() || _fds[i].fd != cli_fd)
+				{
+					--i;
+					continue;
+				}
+			}
+			if (revents & POLLOUT)
+				SendData(i);
+			--i;
+		}
+		for (int j = 0; j < _Quiting.size(); j++)
+			RemoveData(_Quiting[j]);
+		_Quiting.clear();
+		if (_fds[0].revents & POLLIN)
+			AcceptNewClient();
+	}
 }
 
 void Server::ServerSocket()
@@ -47,101 +86,91 @@ void Server::ServerSocket()
 	NewPoll.fd = _SocketFd;
 	NewPoll.events = POLLIN;
 	NewPoll.revents = 0;
-	fds.push_back(NewPoll);
+	_fds.push_back(NewPoll);
 	std::cout << "Server listening on port " << _Port << std::endl;
 }
 
-void Server::run()
+void Server::ReceiveNewData(int i)
 {
-	while (Server::Signal == false)
-	{
-		int res = (poll(&fds[0], fds.size(), -1) == -1);
-		if (res = -1)
-			throw(std::runtime_error("poll() failed"));
-		for (size_t i = 0; i < fds.size(); i++)
-		{
-			int clientsfd = fds[i].fd;
-			int revents = fds[i].revents;
-			if (revents & (POLL_ERR | POLL_HUP | POLLNVAL))
-			{
-				RemoveData(i);
-				i--;
-				continue;
-			}
-			if (revents & POLLIN)
-			{
-				ReceiveNewData(i);
-				if (i >= fds.size() || fds[i].fd != clientsfd)
-				{
-					i--;
-					continue;
-				}
-			}
-			if (revents & POLLOUT)
-				SendData(i);
-			i--;
-		}
-		if (fds[0].revents & POLLIN)
-			AcceptNewClient();
-	}
-	CloseFds();
-}
-
-void Server::CloseFds()
-{
-	for(size_t i = 0; i < _clients.size(); i++)
-	{
-		std::cout <<"Client <" << _clients[i].GetFd() << "> Disconnected" << std::endl;
-		close(_clients[i].GetFd());
-	}
-	if (_SocketFd != -1)
-	{
-		std::cout << "Server <" << _SocketFd << "> Disconnected" << std::endl;
-		close(_SocketFd);
-	}
-}
-
-void Server::ReceiveNewData(int fd)
-{
-	char buff[1024];
+	char buff[512];
 	memset(buff, 0, sizeof(buff));
+	int cli_fd = _fds[i].fd;
+	Client *cli = _clients[cli_fd];
 
-	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1, 0);
+	ssize_t bytes = recv(_fds[i].fd, buff, sizeof(buff) - 1, 0);
 	if (bytes <= 0)
 	{
-		std::cout << "Client: " << fd << " has Disconected" << std::endl;
-		ClearClients(fd);
-		close(fd);
+		RemoveData(i);
+		return;
 	}
+	if (bytes >= 512)
+	{
+		std::cout << "Error: Input too long" << std::endl;
+		cli->ft_getline();
+		return ;
+	}
+	std::string data(buff, bytes);
+	cli->addInput(data);
+	while(cli->fullLine())
+	{
+		std::string line = cli->ft_getline();
+		std::cout << "Message from " << cli->getNickname() << ": " << line <<std::endl;
+		//call cmd function
+	}
+	if (cli->getIsQuit())
+		_Quiting.push_back(i);
 }
 
 void Server::AcceptNewClient()
 {
-	Client cli;
-	struct sockaddr_in cli_add;
-	struct pollfd NewPoll;
-	socklen_t len = sizeof(cli_add);
-
-	int incofd = accept(_SocketFd, (sockaddr *)&(cli_add), &len);
-	if(incofd == -1)
+	while (_running)
 	{
-		std::cout << "accept() failed"<<std::endl;
-		return;
-	}
-	if (fcntl(incofd, F_SETFL, O_NONBLOCK) == -1)
-	{
-		std::cout << "fcntl() failed" << std::endl;
-		return;
-	}
+		sockaddr_in cli_adrr;
+		socklen_t cli_len = sizeof(cli_adrr);
 
-	NewPoll.fd = incofd;
-	NewPoll.events = POLLIN;
-	NewPoll.revents = 0;
+		int cli_fd = accept(_SocketFd, reinterpret_cast<sockaddr*>(&cli_adrr), &cli_len);
+		if (cli_fd == -1)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				break;
+			if (errno = EINTR)
+				continue;
+			throw std::runtime_error("could not accept");
+		}
+		if (fcntl(cli_fd, F_SETFL, O_NONBLOCK) == -1)
+		{
+			close(cli_fd);
+			std::cerr << "Error: fcntl failed" << std::endl;
+			return;
+		}
+		char ip_buffer[INET_ADDRSTRLEN];
+		const char *ip = inet_ntop(AF_INET, &cli_adrr.sin_addr, ip_buffer, sizeof(ip_buffer));
+		if(ip = NULL)
+		{
+			close (cli_fd);
+			std::cerr << "Error: inet_ntop failed" << std::endl;
+			return ;
+		}
+		int cli_Port = htons(cli_adrr.sin_port);
+		Client* client = new Client(cli_fd);
+		_clients[cli_fd] = client;
+		pollfd cli_Poll;
+		cli_Poll.fd = cli_fd;
+		cli_Poll.events = POLLIN;
+		cli_Poll.revents = 0;
+		_fds.push_back(cli_Poll);
+		std::cout << "Client " << cli_fd << " has connected. ip = " << ip << ", port = " << cli_Port << std::endl;
+	}
+}
 
-	cli.SetFd(incofd);
-	cli.SetIpadd(inet_ntoa(cli_add.sin_addr));
-	_clients.push_back(cli);
-	fds.push_back(NewPoll);
+void Server::RemoveData(int i)
+{
+	std::cout << "Data removed" << std::endl;
+}
+
+void Server::SendData(int i)
+{
+	std::cout << "Data sent"<< std::endl;
 }
 
 void Server::SignalHandler(int signum)
@@ -150,25 +179,6 @@ void Server::SignalHandler(int signum)
 	Server::Signal = true;
 }
 
-void Server::ClearClients(int fd)
-{
-	for(size_t i = 0; i < fds.size(); i++)	
-	{
-		if (fds[i].fd == fd)
-		{
-			fds.erase(fds.begin() + i);
-			break;
-		}
-	}
-	for(size_t i = 0; i < _clients.size(); i++)
-	{
-		if(_clients[i].GetFd() == fd)
-		{
-			_clients.erase(_clients.begin() + i);
-			break;
-		}
-	}
-}
 
 std::string Server::GetHostname()
 {

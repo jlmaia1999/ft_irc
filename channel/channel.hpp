@@ -17,6 +17,9 @@
 #include "../server/server.hpp"
 #include "../commands/command.hpp"
 
+class Client;
+class Server;
+
 class Channel
 {
 	private:
