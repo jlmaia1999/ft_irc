@@ -28,7 +28,7 @@ class Server
 		std::string _Password;
 		std::string _hostname;
 		std::vector<struct pollfd> _fds;
-		std::vector<Client*> _clients;
+		std::map<int, Client*> _clients;
 		std::vector<int> _Quiting;
 		std::map<std::string, Channel &> _channels;
 		std::map<std::string, Command *> _commands;

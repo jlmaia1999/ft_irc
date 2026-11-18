@@ -133,7 +133,7 @@ void Server::AcceptNewClient()
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break;
-			if (errno = EINTR)
+			if (errno == EINTR)
 				continue;
 			throw std::runtime_error("could not accept");
 		}
@@ -145,7 +145,7 @@ void Server::AcceptNewClient()
 		}
 		char ip_buffer[INET_ADDRSTRLEN];
 		const char *ip = inet_ntop(AF_INET, &cli_adrr.sin_addr, ip_buffer, sizeof(ip_buffer));
-		if(ip = NULL)
+		if(ip == NULL)
 		{
 			close (cli_fd);
 			std::cerr << "Error: inet_ntop failed" << std::endl;

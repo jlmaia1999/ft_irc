@@ -8,7 +8,12 @@ Client::Client(int socket):
 	_realname(""),
 	_socket(socket),
 	_userset(false),
-	_nickset(false)
+	_nickset(false),
+	_isRegistered(false),
+	_isQuit(false),
+	_isWelcome(false),
+	_input(""),
+	_output("")
 {}
 
 Client &Client::operator=(const Client &other)
@@ -111,12 +116,12 @@ void Client::addInput(const std::string &data)
 
 bool Client::fullLine() const
 {
-	return _input.find("\r\n") != std::string::npos;
+	return (_input.find("\r\n") != std::string::npos);
 }
 
 void Client::addOutput(const std::string &data)
 {
-	_output += _output;
+	_output += data;
 }
 
 bool Client::pendOutput() const
