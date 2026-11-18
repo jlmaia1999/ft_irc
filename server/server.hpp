@@ -11,12 +11,13 @@
 #include <arpa/inet.h> 
 #include <poll.h> 
 #include <csignal> 
+#include <cerrno>
 #include <sstream>
 #include <map>
 #include "../commands/command.hpp"
 
 class Client;
-
+class Command;
 class Channel;
 
 class Server

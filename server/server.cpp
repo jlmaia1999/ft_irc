@@ -3,10 +3,10 @@ bool Server::Signal = false;
 
 Server::Server(int port, std::string password):
 	_running(false),
-	_hostname("127.0.0.1"),
+	_SocketFd(-1),
 	_Port(port),
 	_Password(password),
-	_SocketFd(-1),
+	_hostname("127.0.0.1"),
 	_clients(),
 	_channels(){}
 
@@ -54,7 +54,7 @@ void Server::ServerInit()
 				SendData(i);
 			--i;
 		}
-		for (int j = 0; j < _Quiting.size(); j++)
+		for (unsigned int j = 0; j < _Quiting.size(); j++)
 			RemoveData(_Quiting[j]);
 		_Quiting.clear();
 		if (_fds[0].revents & POLLIN)
@@ -165,11 +165,13 @@ void Server::AcceptNewClient()
 
 void Server::RemoveData(int i)
 {
+	(void)i;
 	std::cout << "Data removed" << std::endl;
 }
 
 void Server::SendData(int i)
 {
+	(void)i;
 	std::cout << "Data sent"<< std::endl;
 }
 

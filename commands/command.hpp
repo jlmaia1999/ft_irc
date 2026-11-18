@@ -21,8 +21,8 @@ class Channel;
 
 class Command
 {
-    public:
-        Command();
-        virtual ~Command();
-        virtual void execute(Server &server, Client &client, const std::vector<std::string>& params) = 0;
+	public:
+		Command();
+		virtual ~Command();
+		virtual void execute(Server &server, Client &client, const std::vector<std::string>& params) = 0;
 };
